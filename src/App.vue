@@ -1,32 +1,94 @@
 <template>
-  <div id="app">
-    <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
-    <router-view/>
-  </div>
+  <v-app>
+    <!-- Navigation -->
+    <v-navigation-drawer app 
+      v-model="drawer"
+      absolute
+      temporary>
+      <v-list-item>
+        <!-- avatar -->
+        <v-list-item-avatar>
+          <v-img src="https://randomuser.me/api/portraits/men/78.jpg"></v-img>
+        </v-list-item-avatar>
+        <!-- intro -->
+        <v-list-item-content m-content>
+          <v-list-item-title>John Leider</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-divider></v-divider>
+
+      <v-list dense>
+          <router-link :to="item.link" 
+            v-for="item in items"
+            :key="item.title"
+            link>
+            <!-- 透過 vue-router來判斷目前路徑，並給予CSS樣式 -->
+            <v-list-item :class="$route.path === item.link ? 'deep-purple accent-4 text-white' : ''">
+                <v-list-item-icon>
+                  <v-icon>{{ item.icon }}</v-icon>
+                </v-list-item-icon>
+
+                <v-list-item-content>
+                  <v-list-item-title>{{ item.title }}</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
+          </router-link>
+      </v-list>
+
+    </v-navigation-drawer>
+
+    <v-app-bar app>
+      <!-- sidebar-icon -->
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+    </v-app-bar>
+
+    <!-- Sizes your content based upon application components -->
+    <v-main>
+      <!-- Provides the application the proper gutter -->
+      <v-container fluid>
+        <!-- If using vue-router -->
+        <router-view></router-view>
+      </v-container>
+    </v-main>
+
+    <v-footer app>
+      <!-- -->
+    </v-footer>
+  </v-app>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<script>
+import Navbar from './components/Navbar.vue';
+export default {
+  components: { Navbar },
+  name: 'App',
+  component: {
+    Navbar: Navbar
+  },
+  data: () => ({
+    drawer: true,
+    items: [
+        { title: 'Home', icon: 'mdi-view-dashboard', link: '/' },
+        { title: 'About', icon: 'mdi-forum', link: '/about' },
+    ],
+  }),
+
+  created(){
+    console.log();
+  },
+};
+</script>
+
+
+<style>
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
-
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+a{
+  list-style: none;
+   text-decoration:none;
 }
 </style>
