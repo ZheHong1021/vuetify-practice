@@ -1,13 +1,17 @@
 <template>
-  <h1>123</h1>
+  <div>
+    <font-awesome-icon icon="fa-solid fa-thumbs-up" />
+  </div>
 </template>
 
 <script>
-
   export default {
-    name: 'Home',
-
     components: {
     },
+    methods:{
+
+    },
+
+
   }
 </script>
