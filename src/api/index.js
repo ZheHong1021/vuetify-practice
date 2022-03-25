@@ -87,6 +87,46 @@ const shrimps = [
         col2: 4.0,
         col3: '1%',
     },
+    {
+        start_date: '2021/11/07',
+        name: '蝦池12號',
+        fat: 11.3,
+        col1: 24,
+        col2: 4.0,
+        col3: '1%',
+    },
+    {
+        start_date: '2021/11/08',
+        name: '蝦池13號',
+        fat: 10.8,
+        col1: 24,
+        col2: 4.0,
+        col3: '1%',
+    },
+    {
+        start_date: '2021/12/20',
+        name: '蝦池14號',
+        fat: 12.4,
+        col1: 24,
+        col2: 4.0,
+        col3: '1%',
+    },
+    {
+        start_date: '2021/10/27',
+        name: '蝦池15號',
+        fat: 8.9,
+        col1: 24,
+        col2: 4.0,
+        col3: '1%',
+    },
+    {
+        start_date: '2021/10/14',
+        name: '蝦池16號',
+        fat: 11.4,
+        col1: 24,
+        col2: 4.0,
+        col3: '1%',
+    },
 
 ]
 

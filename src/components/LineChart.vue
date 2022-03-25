@@ -21,7 +21,11 @@ export default {
     is_reverse:{
       type: Boolean,
       default: false,
-    }
+    },
+    markLine:{
+      type: Object,
+      default:  () =>  ({}),
+    },
   },
   mounted() {
     this.renderLineChart();
@@ -29,15 +33,18 @@ export default {
 
   // 透過 watch，如果需要做圖表資料的變化時 
   watch: {
-    chartData: function() {
-      this.renderLineChart();
+    markLine: {
+      deep: true,
+      handler(){
+        this.renderLineChart();
+      }
     }
   },
 
   methods:{
     renderLineChart(){
       // 從傳入的資料中取出數字與日期，並將其反轉(因為我們拿到的是最新到最舊的資料)
-      const {is_reverse} = this;
+      const {is_reverse, markLine} = this;
 
       const dates = this.chartData.map((d) => d.date)
       const totals = this.chartData.map((d) => d.total)
@@ -46,20 +53,27 @@ export default {
         totals.reverse();
       }
       
+      const datasets = []
+      if(Object.keys(markLine).length !== 0){
+        datasets.push({
+          type: 'bar',
+          label: this.markLine.label,
+          data: this.markLine.data,
+          backgroundColor: '#2ecc71',
+        })
+      }
 
+      datasets.push({ type: 'line', label: this.label, data: totals, ...this.chartColorOptions})
+          
       this.renderChart(
         {
           labels: dates,
-          datasets: [
-            {
-              label: this.label,
-              data: totals,
-              ...this.chartColorOptions
-            },
-          ],
+          datasets: datasets,
         },
         this.options
       )
+
+
     }
   }
 }

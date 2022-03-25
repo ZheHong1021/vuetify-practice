@@ -17,6 +17,9 @@
         <v-row>
           <v-col cols="12" md="6">
               <v-card >
+                <v-card-text>
+                 <h2>蝦池資訊</h2>
+                </v-card-text>
                 <v-container>
                   <v-data-table
                       :headers="headers"
@@ -27,6 +30,7 @@
                       @page-count="pageCount = $event"
                       :search="search"
                       hide-default-footer
+                      @click:row="handleClick"
                     >
                       <template v-slot:top>
                         <v-text-field v-model="search" label="搜尋" class="mx-4"
@@ -47,11 +51,13 @@
           <v-col cols="12" md="6" >
             <v-container>
               <v-card >
+                <v-card-text><h2>生長比較圖</h2></v-card-text>
                 <LineChart  
                     :chartData="renderData.chartData"
                     :options="chartOptions"
                     :label="renderData.label"
                     :chartColorOptions="renderData.chartColorOptions"
+                    :markLine="markLineData"
                   />
 
                   <v-card-text>
@@ -92,6 +98,7 @@ export default {
     return({
       choose_date: null, // 選擇得到的日期
       choose_Shrimp_date: "2021/11/07", // 選擇特定蝦池的起始日期
+      markLineData: {label: '', data: []},
 
       select_area: null,
       items: ['Foo', 'Bar', 'Fizz', 'Buzz'],
@@ -131,7 +138,10 @@ export default {
 
   created(){
     this.shrimps = shrimpsAPI;
+    this.choose_date = dayjs(new Date()).format("YYYY-MM-DD"); // 初始化先設今天日期
+    this.changeDate();
     this.chartDemo()
+
   },
 
   computed: {
@@ -183,9 +193,8 @@ export default {
       for(const shrimp of this.shrimps){
         const start_date = new Date(shrimp.start_date);
         const diff_day = this.difference(start_date, choose_date)
-        this.$set(shrimp, "grow_day", `${diff_day}天`) // 因為 Vue2，在做資料更新時，要用這種方式才能渲染
+        this.$set(shrimp, "grow_day", diff_day) // 因為 Vue2，在做資料更新時，要用這種方式才能渲染
       }
-      this.chartDemo();
     },
 
     // 取得養殖天數
@@ -217,6 +226,20 @@ export default {
       }
     },
 
+    handleClick(event){
+      // console.log(event); // 得到點擊的那列資料
+        this.markLineData.data.length = 0;
+       let markline = event["grow_day"];
+        this.markLineData.label = event['name'];
+        for(let i = 0; i < markline ; i++){
+          if(i == (markline - 1)){
+            this.markLineData.data.push(event["fat"]);
+            break;
+          }
+          this.markLineData.data.push("");
+        }
+
+    }
   },
 
 }
