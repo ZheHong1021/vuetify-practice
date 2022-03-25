@@ -9,7 +9,7 @@
       </v-container>
     </v-main>
 
-    <Footer />
+    <Footer  />
   </v-app>
 </template>
 
@@ -39,6 +39,7 @@ export default {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    transition: .4s;
   }
   body{
     font-size: 100%;
@@ -47,6 +48,18 @@ export default {
   a{
     list-style: none;
     text-decoration:none;
+  }
+
+  /* 所有 View的 container */
+  .main-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    min-height: calc(100vh - 15vh);
+    padding: 15px 10px;
   }
 
     

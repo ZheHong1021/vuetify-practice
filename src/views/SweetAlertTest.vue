@@ -5,13 +5,16 @@
     <v-btn depressed color="success"  @click="showAlert02">兩層用法</v-btn>
     <v-btn depressed color="warning"  @click="showAlert03">自定義用法(Position、Image)</v-btn>
     <v-btn depressed color="info"  @click="showAlert04">自定義用法(background))</v-btn>
+
   </div>
+
+  
 </template>
 
 <script>
-  export default {
-    components: {
-    },
+  // DataPage.vue
+
+export default {
     methods:{
       showAlert01() {
         // Use sweetalert2

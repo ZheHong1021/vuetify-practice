@@ -25,6 +25,11 @@ const routes = [
     name: 'SweetAlertTest',
     component: loadView("SweetAlertTest")
   },
+  {
+    path: '/chart',
+    name: 'chartTest',
+    component: loadView("chartTest")
+  },
 ]
 
 const router = new VueRouter({
