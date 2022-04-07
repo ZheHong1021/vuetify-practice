@@ -4,7 +4,8 @@
     <Navbar/>
 
     <v-main>
-      <v-container fluid>
+
+      <v-container fluid >
         <router-view></router-view>
       </v-container>
     </v-main>
@@ -39,7 +40,7 @@ export default {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    transition: .4s;
+    transition: .25s;
   }
   body{
     font-size: 100%;
@@ -61,28 +62,4 @@ export default {
     min-height: calc(100vh - 15vh);
     padding: 15px 10px;
   }
-
-    
-    /* 全體字型的RWD設定 */
-    @media screen and (max-width: 1440px) {
-        body{
-          font-size: 80%;
-        }
-    }
-    @media screen and (max-width: 1024px) {
-        body{
-          font-size: 70%;
-        }
-    }
-
-    @media screen and (max-width: 768px) {
-        body{
-          font-size: 60%;
-        }
-    }
-    @media screen and (max-width: 578px) {
-        body{
-          font-size: 50%;
-        }
-    }
 </style>

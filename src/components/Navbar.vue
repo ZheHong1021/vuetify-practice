@@ -51,7 +51,12 @@
          <v-spacer></v-spacer>
 
             <nav class="d-flex" v-if="!is_open_navbar">
-              <router-link :to="route.link" v-for="route in routes" :key="route.link">
+              <router-link 
+                :to="route.link" 
+                v-for="route in routes" 
+                :key="route.link"
+                active-class="active" exact
+                class="route-link">
                 <v-toolbar-title class="mx-6 row-pointer">{{route.title}}</v-toolbar-title>
               </router-link>
             </nav>
@@ -90,32 +95,29 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .row-pointer{
-    cursor: pointer;
-    font-weight: bolder;
-    position: relative;
 
-    &::before{
-        content: '';
-        visibility: hidden;
-        width: 0%;    
-        height: 4px;
-        background: #fa0;
-        position: absolute;
-        bottom: -5%;
-        
+
+      // 沒有 active
+    .route-link{
+        color: #9E9E9E;
+        transition: .3s;
+
+        &:hover{
+            color: #f4623a;
+            font-weight: bolder;
+            transform: translateY(-5px);
+        }
     }
 
-    &:hover{
-      font-size: 120%;
 
-      &::before{
-        visibility: visible;
-        animation: animate .4s linear 1;
-        animation-fill-mode: forwards; /* 動畫只執行一次，並保留狀態 */
-      }
+    // 有 active
+    .active{
+        color: #f4623a;
+        font-weight: bolder;
     }
-  }
+
+
+
 
 
   @keyframes animate{
@@ -129,10 +131,5 @@ export default {
         }
     }
 
-
-
-  // .row-pointer >>> tbody tr :hover {
-  //   cursor: pointer;
-  // }
 
 </style>>

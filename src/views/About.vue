@@ -99,13 +99,10 @@ export default {
       choose_date: null, // 選擇得到的日期
       choose_Shrimp_date: "2021/11/07", // 選擇特定蝦池的起始日期
       markLineData: {label: '', data: []},
-
       select_area: null,
       items: ['Foo', 'Bar', 'Fizz', 'Buzz'],
-
       search: '',
       shrimps: [],
-      
       page: 1,
       pageCount: 0,
       itemsPerPage: 10,

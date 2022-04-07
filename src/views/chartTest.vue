@@ -61,7 +61,6 @@ data() {
             'Recovered',
             'Deaths',
         ],
-
         arrPositive: [],
         arrHoptialized: [],
         arrInIcu: [],
