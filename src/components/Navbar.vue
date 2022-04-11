@@ -73,6 +73,7 @@ export default {
       routes: [
           { title: '首頁', icon: 'home', link: '/' },
           { title: '蝦苗重量評估', icon: 'forum', link: '/about' },
+          { title: '蝦苗餵食量記錄', icon: 'dining', link: '/feed' },
           { title: '預估標準', icon: 'preview', link: '/sweetAlert' },
           { title: 'COVID-19 Chart', icon: 'gpp_maybe', link: '/chart' },
       ],

@@ -1,0 +1,121 @@
+<template>
+        <v-row>
+            <v-col cols="12">
+                <v-subheader class="text-body-1 red--text" style="font-weight: bolder;" >
+                    <v-icon color="red">mdi-calendar</v-icon>
+                    &nbsp;昨日紀錄
+                </v-subheader>
+                <v-row>
+                    <v-col cols="6">
+                        <label for="question_one" class="teal--text text-darken-3 font-weight-bold">長度</label>
+                        <v-text-field class="disable-input" disabled readonly solo value="3.5cm" prepend-inner-icon="mdi-ruler"></v-text-field>
+                    </v-col>
+                    <v-col cols="6">
+                        <label for="question_one" class="teal--text text-darken-3 font-weight-bold">重量</label>
+                        <v-text-field class="disable-input" disabled readonly solo value="15g" prepend-inner-icon="mdi-weight-gram"></v-text-field>
+                    </v-col>
+                    <v-col cols="6" md="3">
+                        <label for="question_one" class="teal--text text-darken-3 font-weight-bold">水溫</label>
+                        <v-text-field class="disable-input" value="30.1℃" label="水溫" disabled readonly solo prepend-inner-icon="mdi-thermometer-alert"></v-text-field>
+                    </v-col>
+                    <v-col cols="6" md="3">
+                        <label for="question_one" class="teal--text text-darken-3 font-weight-bold">水質</label>
+                        <v-text-field class="disable-input" value="良好" label="水質" disabled readonly solo prepend-inner-icon="mdi-water-check"></v-text-field>
+                    </v-col>
+                    <v-col cols="6" md="3">
+                        <label for="question_one" class="teal--text text-darken-3 font-weight-bold">飼料種類</label>
+                        <v-text-field class="disable-input" value="A飼料" label="飼料種類" disabled readonly solo prepend-inner-icon="mdi-crowd"></v-text-field>
+                    </v-col>
+                    <v-col cols="6" md="3">
+                        <label for="question_one" class="teal--text text-darken-3 font-weight-bold">品種</label>
+                        <v-text-field class="disable-input" value="白蝦" label="品種" disabled readonly solo prepend-inner-icon="mdi-ballot"></v-text-field>
+                    </v-col>
+                </v-row>
+
+                <v-subheader class="text-body-1 red--text" style="font-weight: bolder;" >
+                    <v-icon color="red">mdi-pen-plus</v-icon>
+                    &nbsp; 餵食量計算結果
+                </v-subheader>
+                <v-row>
+                    <v-col cols="12">
+                        <h3>餵食量: XXX</h3>
+                    </v-col>
+                </v-row>
+
+                <v-divider class="mt-8"></v-divider>
+            </v-col>
+
+            <v-col cols="12">
+                <div class="text-center">
+                    <v-btn :width="btn_rwd_width" height="50px" color="error" @click="dialog = true">
+                        <v-icon left>playlist_add</v-icon>
+                        添加新紀錄
+                    </v-btn>
+                </div>
+            </v-col>
+
+            <!-- 透過 dialog決定是否開啟； 而 @close為 子元件將父元件資料改變的方法' -->
+            <FeedWriteDialog :dialog="dialog" @close="dialog = false"/>
+        </v-row>
+</template>
+
+<script>
+import FeedWriteDialog from '@/components/FeedWriteDialog.vue'
+export default {
+  components: {
+      FeedWriteDialog,
+  },
+  data(){
+      return{
+        date_menu: false,
+        date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+
+        dialog: false,
+      }
+  },
+
+  created(){
+  },
+
+computed: {
+    // 按鈕RWD
+    btn_rwd_width () { 
+        switch (this.$vuetify.breakpoint.name) {
+            case 'xs': return "90%"
+            case 'sm': return "80%"
+            case 'md': return '70%'
+            case 'lg': return '60%'
+            case 'xl': return '50%'
+        }
+        return '100%' // 不用理會
+    },
+
+    step_show_big(){
+          switch (this.$vuetify.breakpoint.name) {
+            case 'xs': return false;
+            case 'sm': return false;
+            case 'md': return true;
+            case 'lg': return true;
+            case 'xl': return true;
+        }
+        return true; // 不用理會
+      },
+},
+
+
+  methods: {
+    
+  },
+
+    
+}
+</script>
+
+
+<style scoped>
+/* 強制將 disabled的文字顏色做修改 */
+    .disable-input >>> input {
+        color: #000 !important;
+    }
+    
+</style>

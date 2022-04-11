@@ -21,6 +21,17 @@ const routes = [
     component: loadView("About")
   },
   {
+    path: '/feed',
+    name: 'Feed',
+    component: loadView("Feed"),
+    redirect: 'feed_home',
+    children: [
+      { path: '', name: 'feed_home', component: loadView("Feed/Home") },
+      { path: '/feed/read', name: 'feed_read', component: loadView("Feed/Read") },
+      { path: '/feed/write', name: 'feed_write', component: loadView("Feed/Write") },
+    ]
+  },
+  {
     path: '/sweetAlert',
     name: 'SweetAlertTest',
     component: loadView("SweetAlertTest")
