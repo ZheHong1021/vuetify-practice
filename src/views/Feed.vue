@@ -1,7 +1,7 @@
 <template>
   <div class="main-container">
     <h1 class="mb-6 text-sm-h4 text-h5">蝦苗重量評估</h1>
-    <v-card :width="rwd_width" class="pa-4">
+    <v-card :width="rwd_width" :class="rwd_padding">
         <v-row>
             <v-col cols="12">
                 <v-row>
@@ -53,6 +53,17 @@ export default {
                 case 'xl': return '70%'
             }
             return '100%' // 不用理會
+        },
+        // v-card寬度
+        rwd_padding () { 
+            switch (this.$vuetify.breakpoint.name) {
+                case 'xs': return "pa-3"
+                case 'sm': return "pa-3"
+                case 'md': return 'pa-4'
+                case 'lg': return 'pa-4'
+                case 'xl': return 'pa-4'
+            }
+            return 'pa-2' // 不用理會
         },
   },
 

@@ -31,6 +31,18 @@ Vue.component('font-awesome-layers-text', FontAwesomeLayersText)
 
 Vue.config.productionTip = false
 
+
+// 全域 mixins
+Vue.mixin({
+  methods: {
+      // 解決四捨五入精密度所帶來的問題
+      roundToTwo(num) {
+          return +(Math.round(num + "e+2")  + "e-2");
+      },
+  }
+})
+
+
 new Vue({
   router,
   store,
