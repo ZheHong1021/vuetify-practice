@@ -155,7 +155,7 @@
                     <!-- 手機板 -->
                     <v-stepper v-else v-model="step" vertical>
                         <!-- Step 01 -->
-                        <v-stepper-step :complete="step > 1" step="1" @click="step = 1">
+                        <v-stepper-step :complete="step > 1" step="1" >
                             計算重量
                         </v-stepper-step>
                         <!-- Step 01 Content-->
@@ -192,7 +192,7 @@
                             </v-stepper-content>
 
                         <!-- Step 02 -->
-                        <v-stepper-step :complete="step >2" step="2" @click="step = 2">
+                        <v-stepper-step :complete="step >2" step="2">
                             計算餵食量
                         </v-stepper-step>
                         <!-- Step 02 Content -->
@@ -247,7 +247,7 @@
                             </v-stepper-content>
 
                         <!-- Step 03 -->
-                        <v-stepper-step :complete="step > 3" step="3" @click="step = 3">
+                        <v-stepper-step :complete="step > 3" step="3">
                             最終結果
                         </v-stepper-step>
                         <!-- Step 03 -->
@@ -462,4 +462,13 @@ export default {
     },
 }
 </script>
+
+
+<style scoped>
+/* 強制將 disabled的文字顏色做修改 */
+    .disable-input >>> input {
+        color: #000 !important;
+    }
+    
+</style>
 

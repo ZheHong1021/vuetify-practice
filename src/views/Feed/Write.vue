@@ -48,7 +48,7 @@
                 </v-subheader>
                 <v-row>
                     <v-col cols="12">
-                        <h3>餵食量: XXX</h3>
+                        <h3>投放的餵食量: {{ total_feed }}</h3>
                     </v-col>
                 </v-row>
 
@@ -93,6 +93,7 @@ export default {
 
         manual_record: false, // 人工紀錄(True / False)
         record_time: "", // 紀錄時間
+        total_feed: "", // 餵食量
       }
   },
 
@@ -105,6 +106,7 @@ export default {
     this.yesterday_select.breed = "白蝦"
     this.manual_record = true;
     this.record_time = "2022-04-12 11:08:57";
+    this.total_feed = "23.87";
   },
 
 computed: {

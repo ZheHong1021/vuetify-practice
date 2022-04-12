@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import axios from 'axios'
 import vuetify from './plugins/vuetify'
 
 /* SweetAlert */
@@ -30,6 +31,7 @@ Vue.component('font-awesome-layers-text', FontAwesomeLayersText)
 
 
 Vue.config.productionTip = false
+Vue.prototype.$axios = axios
 
 
 // 全域 mixins
@@ -47,5 +49,6 @@ new Vue({
   router,
   store,
   vuetify,
+  axios,
   render: h => h(App)
 }).$mount('#app')
