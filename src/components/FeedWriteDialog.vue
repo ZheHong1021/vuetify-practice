@@ -7,7 +7,7 @@
         >
             <template v-slot:default="dialog">
             <v-card>
-                <v-toolbar color="deep-orange darken-2" dark>紀錄步驟</v-toolbar>
+                <v-toolbar color="primary" dark>記錄步驟</v-toolbar>
 
                 <v-card-text class="my-4">
                     <!-- 電腦版 -->
@@ -81,7 +81,8 @@
                                             <v-text-field  
                                                 class="disable-input" label="填入水溫" v-model="select.temp" 
                                                 type="number"  solo prepend-inner-icon="mdi-thermometer-alert"
-                                                persistent-hint :hint="`昨日紀錄: ${yesterday.temp}℃`"></v-text-field>
+                                                persistent-hint :hint="`昨日紀錄: ${yesterday.temp}℃`"
+                                                suffix="℃"></v-text-field>
                                         </v-col>
                                         <v-col cols="6">
                                             <label for="question_one" class="deep-orange--text font-weight-bold">水質</label>
@@ -155,30 +156,129 @@
                     <v-stepper v-else v-model="step" vertical>
                         <!-- Step 01 -->
                         <v-stepper-step :complete="step > 1" step="1" @click="step = 1">
-                            選擇資料夾
+                            計算重量
                         </v-stepper-step>
-                        <v-stepper-content step="1">
-                            <v-card color="grey lighten-1" class="mb-12" height="200px">
-                                <label for="question_one" class="teal--text text-darken-3 font-weight-bold">蝦子長度</label>
-                                <v-text-field label="填入蝦子長度"  solo prepend-inner-icon="mdi-crowd"></v-text-field>
-                            </v-card>
-                        </v-stepper-content>
+                        <!-- Step 01 Content-->
+                            <v-stepper-content step="1">
+                                <v-card  class="pa-2 d-flex flex-column" height="300px">
+                                    <div class="mb-4">
+                                        <label for="question_one" class="teal--text text-darken-3 font-weight-bold">蝦子長度</label>
+                                        <v-text-field label="填入蝦子長度" v-model="shrimp_len" type="number"  
+                                            solo prepend-inner-icon="mdi-crowd" suffix="cm" persistent-hint
+                                            :hint="`昨日紀錄: ${yesterday.length} 公分 / cm`">
+                                        </v-text-field>
+                                        
+                                        <div class="text-center">
+                                            <!-- 在還沒填入資料前，不能點擊 -->
+                                            <v-btn :color="showWieghtInfo ? 'blue-grey lighten-4' : 'success'" @click="computeWeight" 
+                                                :disabled="shrimp_len.length <= 0" :loading="computeWeightLoading">
+                                                {{ showWieghtInfo ? "重新計算" : "計算重量" }}
+                                            </v-btn>
+                                        </div>
+                                    </div>
+
+                                    <template v-if="showWieghtInfo">
+                                        <label for="question_one" class="deep-orange--text font-weight-bold">蝦子重量</label>
+                                        <v-text-field 
+                                            class="disable-input" label="填入蝦子重量" v-model="shrimp_weight" 
+                                            type="number" readonly disabled  solo prepend-inner-icon="mdi-weight-gram" 
+                                            suffix="公克 / g" persistent-hint
+                                            :hint="`昨日紀錄: ${yesterday.weight} 公克 / g`"></v-text-field>
+                                        <div class="text-center mb-4">
+                                            <v-btn color="error" @click="step = 2" :disabled="shrimp_weight.length <= 0">確認並進行下一步</v-btn>
+                                        </div>
+                                    </template>
+                                </v-card>
+                            </v-stepper-content>
 
                         <!-- Step 02 -->
                         <v-stepper-step :complete="step >2" step="2" @click="step = 2">
-                            點擊檔案下載
+                            計算餵食量
                         </v-stepper-step>
+                        <!-- Step 02 Content -->
                         <v-stepper-content step="2">
-                            <v-card color="grey lighten-1" class="mb-12" height="200px">
-                            </v-card>
-                        </v-stepper-content>
+                                <v-card  class="py-4 d-flex flex-column" height="100%">
+                                    <h3 class="d-flex align-center">
+                                        <v-icon>mdi-weight-gram</v-icon>
+                                        &nbsp;{{ shrimp_weight }} (公克/g)
+                                    </h3>
+
+                                    <v-divider class="my-4"></v-divider>
+
+                                    <v-row>
+                                        <v-col cols="12">
+                                            <label for="question_one" class="deep-orange--text font-weight-bold">水溫</label>
+                                            <v-text-field  
+                                                class="disable-input" label="填入水溫" v-model="select.temp" 
+                                                type="number"  solo prepend-inner-icon="mdi-thermometer-alert"
+                                                persistent-hint :hint="`昨日紀錄: ${yesterday.temp}℃`"
+                                                suffix="℃"></v-text-field>
+                                        </v-col>
+                                        <v-col cols="12">
+                                            <label for="question_one" class="deep-orange--text font-weight-bold">水質</label>
+                                            <v-select  v-model="select.water" :items="water_quality"
+                                                menu-props="auto" label="選擇水質"
+                                                prepend-inner-icon="mdi-water-check" solo
+                                                persistent-hint :hint="`昨日紀錄: ${yesterday.water}`"
+                                            ></v-select>
+                                        </v-col>
+                                        <v-col cols="12">
+                                            <label for="question_one" class="deep-orange--text font-weight-bold">飼料</label>
+                                            <v-select  v-model="select.feed" :items="feed_category"
+                                                menu-props="auto" label="選擇飼料種類"
+                                                prepend-inner-icon="mdi-crowd" solo
+                                                persistent-hint :hint="`昨日紀錄: ${yesterday.feed}`"
+                                            ></v-select>
+                                        </v-col>
+                                        <v-col cols="12">
+                                            <label for="question_one" class="deep-orange--text font-weight-bold">品種</label>
+                                            <v-select  v-model="select.breed" :items="shrimp_breed"
+                                                menu-props="auto" label="選擇蝦子品種" 
+                                                prepend-inner-icon="mdi-ballot" solo
+                                                persistent-hint :hint="`昨日紀錄: ${yesterday.breed}`"
+                                            ></v-select>
+                                        </v-col>
+                                    </v-row>
+                                    <div class="text-center my-4">
+                                        <v-btn color="blue-grey darken-1" class="white--text mx-2 my-2" @click="step = 1">回上一步驟</v-btn>
+                                        <v-btn color="error" @click="computeTotalFeed" :disabled="!confirmSelect">確認並進行下一步</v-btn>
+                                    </div>
+                                </v-card>
+                            </v-stepper-content>
 
                         <!-- Step 03 -->
                         <v-stepper-step :complete="step > 3" step="3" @click="step = 3">
-                            下載完成
+                            最終結果
                         </v-stepper-step>
+                        <!-- Step 03 -->
                         <v-stepper-content step="3">
-                            <v-card color="grey lighten-1" class="mb-12" height="200px">
+                            <v-card  class="pa-2 d-flex flex-column" height="300px">
+                                <v-row>
+                                    <v-col v-if="progress_Loading" cols="12" class="d-flex flex-column justify-center align-center">
+                                        <h3 class="text-center mb-2">計算餵食量</h3>
+                                        <v-progress-linear
+                                            color="deep-purple accent-4"
+                                            indeterminate
+                                            rounded
+                                            height="6"
+                                        ></v-progress-linear>
+                                    </v-col>
+
+                                    <v-col v-else cols="12">
+                                        <h3 class="text-center mb-2 text-h5 font-weight-bold">計算結果</h3>
+                                        <h3 class="">餵食量為: {{ totalFeed }}</h3>
+
+                                        <v-divider class="my-4"></v-divider>
+
+                                        <div class="text-center">
+                                            <v-btn color="blue-grey darken-1" class="white--text mx-2" @click="step = 2">回上一步驟</v-btn>
+                                            <v-btn color="success" @click="saveToDataBase">
+                                                <v-icon left>save_as</v-icon>
+                                                儲存
+                                            </v-btn>
+                                        </div>
+                                    </v-col>
+                                </v-row>
                             </v-card>
                         </v-stepper-content>
                     </v-stepper>

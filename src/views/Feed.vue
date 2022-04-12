@@ -1,6 +1,6 @@
 <template>
   <div class="main-container">
-    <h1 class="mb-6 text-sm-h4 text-h5">蝦苗重量評估</h1>
+    <h1 class="mb-6 text-sm-h4 text-h5">蝦苗餵食量紀錄</h1>
     <v-card :width="rwd_width" :class="rwd_padding">
         <v-row>
             <v-col cols="12">
