@@ -108,7 +108,6 @@ export default {
           is_re_computing: false,
       }
     },
-
     computed: {
         // 按鈕RWD
         btn_rwd_width () { 
@@ -121,18 +120,41 @@ export default {
             }
             return '100%' // 不用理會
         },
+
+        // 欲監聽的數據
+        watch_obj(){
+          const { weight, temp, water_quality, feed, breed } = this.record
+          return { weight, temp, water_quality, feed, breed }
+        },
     },
 
     watch:{
-      record:{
+      watch_obj:{
         deep: true,
         async handler(newVal, oldVal){
-          if( Object.keys(oldVal).length > 0 ){
 
-            // 跑載入畫面 (2.5秒)
+          // 防止一開始進來跑一次(oldVal中的屬性都為 undefined)
+          if( oldVal.weight ){
+            // 跑載入畫面 (2秒)
             this.is_re_computing = true
-            await new Promise(resolve => setTimeout(resolve, 2500))
+            let { weight, temp, water_quality, feed, breed} = this.record;
+            const obj = {
+                weight: weight,
+                temp: temp,
+                water: water_quality,
+                feed: feed,
+                breed: breed,
+            }
+
+            let result = this.computeTotalFeed(obj) // 透過全域mixins(main.js裡)的methods 
+            result = this.roundToTwo(result);  // 透過全域mixins(main.js裡)的methods，來執行四捨五入到小數第二位
+            this.$set(this.record, 'total_feed', result)
+
+
+
+            await new Promise(resolve => setTimeout(resolve, 2000))
             this.is_re_computing = false
+
 
           }
         }

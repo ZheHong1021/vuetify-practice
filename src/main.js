@@ -41,6 +41,38 @@ Vue.mixin({
       roundToTwo(num) {
           return +(Math.round(num + "e+2")  + "e-2");
       },
+
+      computeWeight(length){
+        return parseFloat(length) * 2 + (20 * 0.01) / 0.5  + 3
+      },
+
+      computeTotalFeed(obj){
+        // 係數取得 (水質、飼料種類、蝦子品種)
+        let water_index = 0
+          switch(obj.water){
+              case "非常差": feed_index = 2; break;
+              case "差": feed_index = 3; break;
+              case "正常": feed_index = 4; break;
+              case "良好": feed_index = 5; break;
+              case "非常良好": feed_index = 6; break;
+          }
+        let feed_index = 0
+            switch(obj.feed){
+                case "非常差": feed_index =  2; break;
+                case "差": feed_index =  3; break;
+                case "正常": feed_index =  4; break;
+                case "良好": feed_index =  5; break;
+            }
+        let breed_index = 0
+            switch(obj.breed){
+                case "白蝦": breed_index = 2; break;
+                case "草蝦": breed_index = 3; break;
+                case "泰國蝦": breed_index = 4; break;
+                case "明蝦": breed_index = 5; break;
+            }
+
+          return (obj.weight * 1.5 - 3) + ( obj.temp * 0.5 + water_index * 0.7 + feed_index * 0.3 + breed_index * 0.9)
+      }
   }
 })
 

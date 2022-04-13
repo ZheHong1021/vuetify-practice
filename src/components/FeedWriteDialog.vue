@@ -44,7 +44,7 @@
                                         </v-text-field>
                                         <div class="text-center">
                                             <!-- 在還沒填入資料前，不能點擊 -->
-                                            <v-btn :color="showWieghtInfo ? 'blue-grey lighten-4' : 'success'" @click="computeWeight" 
+                                            <v-btn :color="showWieghtInfo ? 'blue-grey lighten-4' : 'success'" @click="startComputeWeight" 
                                                 :disabled="shrimp_len.length <= 0" :loading="computeWeightLoading">
                                                 {{ showWieghtInfo ? "重新計算" : "計算重量" }}
                                             </v-btn>
@@ -111,7 +111,7 @@
                                     </v-row>
                                     <div class="text-center my-4">
                                         <v-btn color="blue-grey darken-1" class="white--text mx-2" @click="step = 1">回上一步驟</v-btn>
-                                        <v-btn color="error" @click="computeTotalFeed" :disabled="!confirmSelect">確認並進行下一步</v-btn>
+                                        <v-btn color="error" @click="goFinalStep" :disabled="!confirmSelect">確認並進行下一步</v-btn>
                                     </div>
 
                                 </v-card>
@@ -176,7 +176,7 @@
                                         
                                         <div class="text-center">
                                             <!-- 在還沒填入資料前，不能點擊 -->
-                                            <v-btn :color="showWieghtInfo ? 'blue-grey lighten-4' : 'success'" @click="computeWeight" 
+                                            <v-btn :color="showWieghtInfo ? 'blue-grey lighten-4' : 'success'" @click="startComputeWeight" 
                                                 :disabled="shrimp_len.length <= 0" :loading="computeWeightLoading">
                                                 {{ showWieghtInfo ? "重新計算" : "計算重量" }}
                                             </v-btn>
@@ -247,7 +247,7 @@
                                     </v-row>
                                     <div class="text-center my-4">
                                         <v-btn color="blue-grey darken-1" class="white--text mx-2 my-2" @click="step = 1">回上一步驟</v-btn>
-                                        <v-btn color="error" @click="computeTotalFeed" :disabled="!confirmSelect">確認並進行下一步</v-btn>
+                                        <v-btn color="error" @click="goFinalStep" :disabled="!confirmSelect">確認並進行下一步</v-btn>
                                     </div>
                                 </v-card>
                             </v-stepper-content>
@@ -383,42 +383,11 @@ export default {
         }
         return true; // 不用理會(不想觸發 eslint的紅色提示)
       },
-
-    // 係數取得 (水質、飼料種類、蝦子品種)
-    water_index(){
-        switch(this.select.water){
-            case "非常差": return 2;
-            case "差": return 3;
-            case "正常": return 4;
-            case "良好": return 5;
-            case "非常良好": return 6;
-        }
-        return 0; // 不用理會(不想觸發 eslint的紅色提示)
-    },
-    feed_index(){
-        switch(this.select.feed){
-            case "非常差": return 2;
-            case "差": return 2;
-            case "正常": return 2;
-            case "良好": return 2;
-        }
-        return 0; // 不用理會(不想觸發 eslint的紅色提示)
-    },
-    breed_index(){
-        switch(this.select.breed){
-            case "白蝦": return 2;
-            case "草蝦": return 3;
-            case "泰國蝦": return 4;
-            case "明蝦": return 5;
-        }
-        return 0; // 不用理會(不想觸發 eslint的紅色提示)
-    },
-
     },
 
     methods:{
         // 輸入完長度後，要計算重量的事件
-        async computeWeight(){
+        async startComputeWeight(){
             if (parseFloat(this.shrimp_len) <= 0 ){
                 this.$swal.fire({
                     icon: "error",
@@ -439,12 +408,12 @@ export default {
             this.computeWeightLoading = false
             this.showWieghtInfo = true
 
-            // 這邊要帶公式(之後會加進來)
-            this.shrimp_weight = parseFloat(this.shrimp_len) * 2 + (20 * 0.01) / 0.5  + 3
+            // 這邊要帶公式 // 透過全域mixins(main.js裡)的methods
+            this.shrimp_weight = this.computeWeight(this.shrimp_len)
         },
 
         // 當資料都選完後，進行最後的步驟- 計算餵食量
-        async computeTotalFeed(){
+        async goFinalStep(){
             this.step = 3; // 進入到第三步驟
 
             // 跑載入畫面 (2.5秒)
@@ -452,10 +421,17 @@ export default {
             await new Promise(resolve => setTimeout(resolve, 2500))
             this.progress_Loading = false
 
-            const {temp} = this.select; // 解構
-            const {shrimp_weight, water_index, feed_index, breed_index} = this; // 解構 (computed)
-            this.totalFeed = (shrimp_weight * 1.5 - 3) + ( temp * 0.5 + water_index * 0.7 + feed_index * 0.3 + breed_index * 0.9)
-            this.totalFeed = this.roundToTwo(this.totalFeed);  // 透過全域mixins(main.js裡)，來執行四捨五入到小數第二位
+            const {temp, water, feed, breed} = this.select; // 解構
+
+            const obj = {
+                weight: this.shrimp_weight,
+                temp: temp,
+                water: water,
+                feed: feed,
+                breed: breed,
+            }
+            this.totalFeed = this.computeTotalFeed(obj) // 透過全域mixins(main.js裡)的methods
+            this.totalFeed = this.roundToTwo(this.totalFeed);  // 透過全域mixins(main.js裡)的methods，來執行四捨五入到小數第二位
         },
 
         closeDialog(){
