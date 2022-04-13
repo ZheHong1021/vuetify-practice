@@ -107,7 +107,8 @@ export default {
           shrimp_breed : ["白蝦", "草蝦", "泰國蝦", "明蝦"],
           record_name_List: ["測試人員", "子惠", "宛真", "育華", "珈錚", "姵彤"], // 紀錄者名稱列表
 
-          is_re_computing: false,
+          is_re_computing: false, // 用來跑運算的Loading
+          is_update: false, // 查看有無修改記錄
       }
     },
     computed: {
@@ -131,15 +132,22 @@ export default {
     },
 
     watch:{
+      // 單純用來查看使用者有無修改資料，如有則提醒儲存修改
+      record:{
+        deep: true,
+        handler(newVal, oldVal){
+          // 避免起始載入資料時就觸發
+          if( Object.keys(oldVal).length > 0 ){
+            this.is_update = true;
+          }
+        }
+      },
       watch_obj:{
         deep: true,
         async handler(newVal, oldVal){
           // 防止一開始進來跑一次(oldVal中的屬性都為 undefined)
           if( oldVal.weight ){
             // 跑載入畫面 (2秒)
-            this.is_re_computing = true
-            await new Promise(resolve => setTimeout(resolve, 2000))
-            this.is_re_computing = false
 
             let { weight, temp, water_quality, feed, breed} = newVal;
             const obj = {
@@ -153,6 +161,10 @@ export default {
             let result = this.computeTotalFeed(obj) // 透過全域mixins(main.js裡)的methods 
             result = this.roundToTwo(result);  // 透過全域mixins(main.js裡)的methods，來執行四捨五入到小數第二位
             this.$set(this.record, 'total_feed', result)
+
+            this.is_re_computing = true
+            await new Promise(resolve => setTimeout(resolve, 2000))
+            this.is_re_computing = false
           }
         }
       },
@@ -171,6 +183,8 @@ export default {
                   data.created_at = dayjs(data.created_at).format('YYYY/MM/DD HH:mm:ss')
                   data.updated_at = dayjs(data.updated_at).format('YYYY/MM/DD HH:mm:ss')
                   this.record = data // 將資料載入到 vue中
+                  
+
               },
             ).catch(err=>{
                 console.log(err) //沒接收到 印出ERROR
@@ -191,12 +205,18 @@ export default {
           axios.put(`/api/${this.$route.params.id}/`, formData, {
               headers: { "Content-Type": "multipart/form-data" },
           })
-          .then(response=> {
-              this.readRecord();
-                this.$swal.fire({
-                    icon: "success",
-                    title: "更新成功",
-                })
+          .then(response=>{
+              this.$set(this.record, 'updated_at', dayjs().format('YYYY/MM/DD HH:mm:ss'))
+              this.$swal.fire({
+                icon: "success",
+                  title: "更新成功",
+              }).then(result=>{
+                // 不管怎樣都把 is_udpate給關起來，不然會一直跳提醒
+                if(result.isConfirmed){
+                  this.is_update = false;
+                }
+                this.is_update = false;
+              })
             })
             .catch((error)=> {
                 //handle error
@@ -238,6 +258,30 @@ export default {
         const result = this.computeWeight(len)
         this.$set(this.record, 'weight', result)
       }
-    }
+    },
+
+
+    beforeRouteLeave (to, from , next) {
+        if(!this.is_update){
+            next(); // 代表資料已經被保存，則可以直接離開
+        }else{
+            // 透過 Object
+            this.$swal.fire({
+                title: '儲存提醒',
+                text: '您還未保存資料，確定要離開該頁面嗎?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '直接離開',
+                cancelButtonText: '取消',
+            })
+            .then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                // 如果按了 Confirm按鈕
+                if (result.isConfirmed) {
+                    next()
+                }
+            })
+        }
+    },
 }
 </script>
