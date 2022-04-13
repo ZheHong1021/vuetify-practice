@@ -3,7 +3,6 @@
     <v-navigation-drawer app 
         v-model="drawer"
         v-if="is_open_navbar"
-        absolute
         temporary>
         <v-list-item>
           <!-- avatar -->
@@ -36,7 +35,6 @@
               </v-list-item>
             </router-link>
         </v-list>
-
       </v-navigation-drawer>
 
       <v-app-bar app>

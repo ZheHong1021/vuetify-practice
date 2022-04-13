@@ -267,11 +267,11 @@ export default {
         }else{
             // 透過 Object
             this.$swal.fire({
-                title: '儲存提醒',
-                text: '您還未保存資料，確定要離開該頁面嗎?',
+                title: '變更儲存提醒',
+                text: '您有資料做了變更，但尚未儲存，請問要直接離開嗎?',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: '直接離開',
+                confirmButtonText: '離開',
                 cancelButtonText: '取消',
             })
             .then((result) => {

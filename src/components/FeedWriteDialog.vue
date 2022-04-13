@@ -432,6 +432,7 @@ export default {
             }
             this.totalFeed = this.computeTotalFeed(obj) // 透過全域mixins(main.js裡)的methods
             this.totalFeed = this.roundToTwo(this.totalFeed);  // 透過全域mixins(main.js裡)的methods，來執行四捨五入到小數第二位
+        
         },
 
         closeDialog(){

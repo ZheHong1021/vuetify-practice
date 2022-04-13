@@ -30,7 +30,8 @@ Vue.component('font-awesome-layers', FontAwesomeLayers)
 Vue.component('font-awesome-layers-text', FontAwesomeLayersText)
 
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false // true: 線上發布 / false: 測試
+Vue.config.devtools = false // false: 關閉devtool
 Vue.prototype.$axios = axios
 
 
