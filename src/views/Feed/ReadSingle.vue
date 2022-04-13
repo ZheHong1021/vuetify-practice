@@ -19,11 +19,13 @@
                     </v-col>
                     <v-col cols="6">
                         <label for="question_one" class="deep-orange--text font-weight-bold">長度</label>
-                        <v-text-field v-model="record.length" class="disable-input" solo  prepend-inner-icon="mdi-ruler" :suffix="$vuetify.breakpoint.name === 'xs' ? 'cm' : '公分 / cm'"></v-text-field>
+                        <v-text-field @change="changeWeight" v-model="record.length" class="disable-input" solo  prepend-inner-icon="mdi-ruler" :suffix="$vuetify.breakpoint.name === 'xs' ? 'cm' : '公分 / cm'"></v-text-field>
                     </v-col>
                     <v-col cols="6">
                         <label for="question_one" class="deep-orange--text font-weight-bold">重量</label>
-                        <v-text-field v-model="record.weight" class="disable-input" solo  prepend-inner-icon="mdi-weight-gram" :suffix="$vuetify.breakpoint.name === 'xs' ? 'g' : '公克 / g' "></v-text-field>
+                        <v-text-field  v-model="record.weight" class="disable-input" 
+                          solo  prepend-inner-icon="mdi-weight-gram" :suffix="$vuetify.breakpoint.name === 'xs' ? 'g' : '公克 / g' " 
+                          readonly disabled hint="透過長度來改變" persistent-hint></v-text-field>
                     </v-col>
                     <v-col cols="6" md="3">
                         <label for="question_one" class="deep-orange--text font-weight-bold">水溫</label>
@@ -132,12 +134,14 @@ export default {
       watch_obj:{
         deep: true,
         async handler(newVal, oldVal){
-
           // 防止一開始進來跑一次(oldVal中的屬性都為 undefined)
           if( oldVal.weight ){
             // 跑載入畫面 (2秒)
             this.is_re_computing = true
-            let { weight, temp, water_quality, feed, breed} = this.record;
+            await new Promise(resolve => setTimeout(resolve, 2000))
+            this.is_re_computing = false
+
+            let { weight, temp, water_quality, feed, breed} = newVal;
             const obj = {
                 weight: weight,
                 temp: temp,
@@ -149,16 +153,9 @@ export default {
             let result = this.computeTotalFeed(obj) // 透過全域mixins(main.js裡)的methods 
             result = this.roundToTwo(result);  // 透過全域mixins(main.js裡)的methods，來執行四捨五入到小數第二位
             this.$set(this.record, 'total_feed', result)
-
-
-
-            await new Promise(resolve => setTimeout(resolve, 2000))
-            this.is_re_computing = false
-
-
           }
         }
-      }
+      },
     },
     mounted(){
       this.readRecord();
@@ -235,6 +232,12 @@ export default {
             }
         })
       },
+
+      // 透過 v-text-field的 change事件中所提供的參數(輸入值)，來進行重量運算
+      changeWeight(len){
+        const result = this.computeWeight(len)
+        this.$set(this.record, 'weight', result)
+      }
     }
 }
 </script>
