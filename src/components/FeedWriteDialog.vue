@@ -166,12 +166,12 @@
                         </v-stepper-step>
                         <!-- Step 01 Content-->
                             <v-stepper-content step="1">
-                                <v-card  class="pa-2 d-flex flex-column" height="300px">
+                                <v-card  class="pa-1 d-flex flex-column" height="300px">
                                     <div class="mb-4">
                                         <label for="question_one" class="teal--text text-darken-3 font-weight-bold">蝦子長度</label>
                                         <v-text-field label="填入蝦子長度" v-model="shrimp_len" type="number"  
                                             solo prepend-inner-icon="mdi-crowd" suffix="cm" persistent-hint
-                                            :hint="`昨日紀錄: ${yesterday.length} 公分 / cm`">
+                                            :hint="`昨日紀錄: ${yesterday.length} 公分`">
                                         </v-text-field>
                                         
                                         <div class="text-center">
@@ -188,8 +188,8 @@
                                         <v-text-field 
                                             class="disable-input" label="填入蝦子重量" v-model="shrimp_weight" 
                                             type="number" readonly disabled  solo prepend-inner-icon="mdi-weight-gram" 
-                                            suffix="公克 / g" persistent-hint
-                                            :hint="`昨日紀錄: ${yesterday.weight} 公克 / g`"></v-text-field>
+                                            suffix="g" persistent-hint
+                                            :hint="`昨日紀錄: ${yesterday.weight} 公克`"></v-text-field>
                                         <div class="text-center mb-4">
                                             <v-btn color="error" @click="step = 2" :disabled="shrimp_weight.length <= 0">確認並進行下一步</v-btn>
                                         </div>
@@ -280,7 +280,7 @@
                                             <label for="question_one" class="deep-orange--text font-weight-bold">記錄人員</label>
                                             <v-select  v-model="record_name" :items="record_name_List"
                                                 menu-props="auto" label="選擇記錄人員" 
-                                                prepend-inner-icon="mdi-ballot" solo
+                                                prepend-inner-icon="mdi-account-box" solo
                                             ></v-select>
 
                                             <v-btn color="blue-grey darken-1" class="white--text mx-2" @click="step = 2">回上一步驟</v-btn>

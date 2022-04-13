@@ -27,7 +27,8 @@ const routes = [
     redirect: 'feed_home',
     children: [
       { path: '', name: 'feed_home', component: loadView("Feed/Home") },
-      { path: '/feed/read', name: 'feed_read', component: loadView("Feed/Read") },
+      { path: '/feed/read', name: 'feed_read', component: loadView("Feed/Read")}, 
+      { path: '/feed/read/:id', name: 'feed_read_single',  component: loadView("Feed/ReadSingle") },
       { path: '/feed/write', name: 'feed_write', component: loadView("Feed/Write") },
     ]
   },

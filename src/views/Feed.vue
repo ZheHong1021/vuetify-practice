@@ -8,7 +8,7 @@
                     <v-col cols="12" sm="6" class="text-left">
                         <!-- 上一頁功能不能在第一頁顯示 -->
                         <!-- 設置點擊事件來返回上一頁 (router.back) -->
-                        <v-btn color="primary"  outlined v-if="$route.path !== '/feed' " @click="$router.back()">
+                        <v-btn color="primary"  outlined v-if="$route.name !== 'feed_home' " @click="goBack">
                             <v-icon left>arrow_circle_left</v-icon>
                             回上一頁
                         </v-btn>
@@ -97,7 +97,18 @@ export default {
         this.nowDate = `${Y}年${M}月${D}日`;
         this.nowWeek = `周${W}`; 
         this.nowTime = `${H}:${Min}:${S}`;
-        },
+    },
+
+    goBack(){
+
+        // 只有讀取單一頁時觸發
+        if(this.$route.name === 'feed_read_single'){
+            this.$router.push({name: 'feed_read'})
+        }else{
+            this.$router.push({name: 'feed_home'})
+        }
+
+    }
   },
 
   mounted() { 

@@ -56,7 +56,7 @@ export default {
     mounted(){
 
       // 讀取 API (顯示所有資料)
-        axios.get('/api').then(
+        axios.get('/api/').then(
             res => {
                 const datas = res.data
 
@@ -76,8 +76,7 @@ export default {
 
       handleClick(event){
         const id = event.id; // 透過點擊事件得到 id
-        console.log(id);
-
+        this.$router.push({name: 'feed_read_single', params: {id: id} }) // 點擊導引
       }
     }
 }
