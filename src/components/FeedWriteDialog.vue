@@ -137,6 +137,12 @@
 
                                             <v-divider class="my-4"></v-divider>
 
+                                            <label for="question_one" class="deep-orange--text font-weight-bold">記錄人員</label>
+                                            <v-select  v-model="record_name" :items="record_name_List"
+                                                menu-props="auto" label="選擇記錄人員" 
+                                                prepend-inner-icon="mdi-account-box" solo
+                                            ></v-select>
+
                                             <div class="text-center">
                                                 <v-btn color="blue-grey darken-1" class="white--text mx-2" @click="step = 2">回上一步驟</v-btn>
                                                 <v-btn color="success" @click="saveToDataBase">
@@ -152,7 +158,7 @@
                         </v-stepper-items>
                     </v-stepper>
 
-                    <!-- 手機板 -->
+                    <!-- 手機板 (跟PC介面是一樣功能的，只要挑一個看就好) -->
                     <v-stepper v-else v-model="step" vertical>
                         <!-- Step 01 -->
                         <v-stepper-step :complete="step > 1" step="1" >
@@ -271,6 +277,12 @@
                                         <v-divider class="my-4"></v-divider>
 
                                         <div class="text-center">
+                                            <label for="question_one" class="deep-orange--text font-weight-bold">記錄人員</label>
+                                            <v-select  v-model="record_name" :items="record_name_List"
+                                                menu-props="auto" label="選擇記錄人員" 
+                                                prepend-inner-icon="mdi-ballot" solo
+                                            ></v-select>
+
                                             <v-btn color="blue-grey darken-1" class="white--text mx-2" @click="step = 2">回上一步驟</v-btn>
                                             <v-btn color="success" @click="saveToDataBase">
                                                 <v-icon left>save_as</v-icon>
@@ -293,6 +305,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
     props:{
         dialog:{
@@ -323,6 +336,7 @@ export default {
                 feed: "",
                 breed: "",
             },
+
             water_temp: "", // 水溫
             water_quality: [], // 水質(應為從資料庫中得到)
             feed_category: [], // 飼料種類
@@ -332,7 +346,8 @@ export default {
         // Step 03
             progress_Loading: false, // 用來做畫面修飾的動畫
             totalFeed: 0, // 最後餵食量結果
-
+            record_name: "", // 紀錄者名字
+            record_name_List: ["測試人員", "子惠", "宛真", "育華", "珈錚", "姵彤"], // 紀錄者名稱列表
         }
     },
 
@@ -444,19 +459,51 @@ export default {
         },
 
         closeDialog(){
-            // this.$swal.fire({
-            //     icon: "warning",
-            //     title: "儲存提醒",
-            //     cancelButton: true,
-            // })
             this.$emit('close')
         },
 
         saveToDataBase(){
-            this.$swal.fire({
-                icon: "success",
-                title: "儲存成功",
+            // 設定表單格式(用來傳給 POST)
+            const formData = new FormData();
+            formData.append("name", this.record_name);
+            formData.append("length", this.shrimp_len);
+            formData.append("weight", this.shrimp_weight);
+            formData.append("temp", this.select.temp);
+            formData.append("water_quality", this.select.water);
+            formData.append("feed", this.select.feed);
+            formData.append("breed", this.select.breed);
+            formData.append("total_feed", this.totalFeed);
+            axios.post("/api/", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
             })
+            .then(response=> {
+                this.$swal.fire({
+                    icon: "success",
+                    title: "儲存成功",
+                    text: "有需要幫你導引到查詢紀錄頁面嗎",
+                    showCancelButton: true,
+                    confirmButtonText: '傳送',
+                    cancelButtonText: '取消',
+                }).then(result=>{
+                    if(result.isConfirmed){
+                        this.$router.push({name: "feed_read"})
+                        this.$swal.fire({icon: "success", title: "成功傳送"})
+                    }
+                })
+            })
+            .catch((error)=> {
+                //handle error
+                if (error.response) {
+                    const response_data = error.response.data
+                    this.$swal.fire({
+                        icon: 'warning',
+                        title: "記錄失敗",
+                        text: response_data.message,
+                    })
+                }
+            });
+           
+
         },
 
     },

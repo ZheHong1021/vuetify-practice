@@ -47,14 +47,7 @@ import axios from 'axios';
 
     },
     created(){
-      axios.get('/api').then(
-            res => {
-                console.log(res);
-            },
-            error => {
-                alert(error) //沒接收到 印出ERROR
-            }
-        )
+           
     },
 
 
