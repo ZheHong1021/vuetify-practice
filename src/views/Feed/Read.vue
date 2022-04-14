@@ -1,6 +1,10 @@
 <template>
   <div>
-      <h1>查詢</h1>
+      <h1 class="mb-4 text-h5 font-weight-bold pink--text text-darken-1">
+        <v-icon large color="pink darken-1">mdi-table-eye</v-icon>
+        查詢
+      </h1>
+
           <v-data-table
             :headers="table.headers"
             :items="record_all"
@@ -13,6 +17,8 @@
             @click:row="handleClick"
             :sort-by="['created_at']"
             :sort-desc="[true]"
+            group-by="category"
+            groupDesc="true"
           >
             <template v-slot:top>
               <v-text-field v-model="table.search" label="搜尋" class="mx-4"
@@ -45,6 +51,7 @@ export default {
             {text: '飼料種類', value: 'feed'},
             {text: '品種', value: 'breed'},
             {text: '餵食量', value: 'total_feed'},
+            { text: '日期', value: 'category', align: 'right' },
           ],
           search: '',
           page: 1,
@@ -63,6 +70,7 @@ export default {
                 // 處理時間，因為後端Django傳回來的資料為【時間格式】，必須轉換成【時間字串】
                 for(const data of datas){
                    data.created_at = dayjs(data.created_at).format('YYYY/MM/DD HH:mm:ss')
+                   data.category = dayjs(data.created_at).format('YYYY/MM/DD')
                 }
                 this.record_all = datas // 將資料載入到 vue中
             },
@@ -73,7 +81,6 @@ export default {
     },
 
     methods:{
-
       handleClick(event){
         const id = event.id; // 透過點擊事件得到 id
         this.$router.push({name: 'feed_read_single', params: {id: id} }) // 點擊導引

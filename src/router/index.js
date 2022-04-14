@@ -42,6 +42,14 @@ const routes = [
     name: 'chartTest',
     component: loadView("chartTest")
   },
+
+  
+  /* 把 404 Page放置到最下面(*) */
+  {
+    path: '/*',
+    name: 'NotFoundPage',
+    component: loadView("NotFoundPage"),
+  },
 ]
 
 const router = new VueRouter({
