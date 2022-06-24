@@ -134,7 +134,6 @@ computed: {
     },
 },
 
-
   methods: {
     
   },

@@ -42,6 +42,11 @@ const routes = [
     name: 'chartTest',
     component: loadView("chartTest")
   },
+  {
+    path: '/test',
+    name: 'Test',
+    component: loadView("Test")
+  },
 
   
   /* 把 404 Page放置到最下面(*) */
