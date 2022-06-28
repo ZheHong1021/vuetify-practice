@@ -78,14 +78,47 @@
                     <v-row v-else>
                         <v-col cols="12" md="6" lg="4" 
                             v-for="test in test_result" :key="test.id">
-                            <v-card min-height="450">
+                            <v-card elevation="4" class="my-4" color="orange lighten-5"
+                                @click="readProjectTest(test)">
                                 <!-- 日期 -->
                                 <v-card-title class="font-weight-bold">
                                     <v-chip class="text-subtitle-1 mr-2 font-weight-bold" color="black" label text-color="white">取樣時間</v-chip>
-                                    {{ test.date["sample"] }}
+                                    {{ test.date }}
                                 </v-card-title>
+                                <v-card-text>
+                                    <v-row >
+                                        <!-- 廠池 -->
+                                        <v-col cols="12" md="6" class="d-flex align-center">
+                                            <v-chip class="text-subtitle-1" color="blue" label text-color="white" small>廠池</v-chip>
+                                            <span class="ml-2 text-h6 font-weight-bold">{{ test.factory }}</span>
+                                        </v-col>
 
+                                        <!-- 測試項目 -->
+                                        <v-col cols="12" md="6" class="d-flex align-center">
+                                            <v-chip class="text-subtitle-1" color="blue" label text-color="white" small>測試項目</v-chip>
+                                            <span class="ml-2 text-h6 font-weight-bold">{{ test.project }}</span>
+                                        </v-col>
+                                    </v-row>
 
+                                    <!-- 檢測結果 -->
+                                    <v-row class="pa-4 pa-lg-8">
+                                        <v-col cols="12" md="6">
+                                            <v-card class="pa-2 pa-lg-4 d-flex flex-column justify-center align-center" color="green lighten-4">
+                                                <v-chip class="text-subtitle-1" color="green darken-2" label text-color="white" small>檢驗結果一</v-chip>
+                                                <h3 class="text-h6 font-weight-bold">{{ test.result_one }}</h3>
+                                            </v-card>
+                                        </v-col>
+                                        <v-col cols="12" md="6">
+                                            <v-card class="pa-2 pa-lg-4 d-flex flex-column justify-center align-center" color="green lighten-4">
+                                                <v-chip class="text-subtitle-1" color="green darken-2" label text-color="white" small>檢驗結果二</v-chip>
+                                                <h3 class="text-h6 font-weight-bold">{{ test.result_two }}</h3>
+                                            </v-card>
+                                        </v-col>
+                                        <v-col cols="12">
+                                            <v-img height="200" :src="test.img"></v-img>
+                                        </v-col>
+                                    </v-row>
+                                </v-card-text>
                             </v-card>
                         </v-col>
                     </v-row>
@@ -134,6 +167,12 @@ export default {
             date_menu: false,
 
             
+            // test_result: [
+            //     {id: 'test_01', date: '2022/05/30', factory: '2B#1905', project: 'EHP', result_one: '未檢出', result_two: '未檢出', remark: '備註01', img: 'https://images.unsplash.com/photo-1510941781581-59620dc6bfdd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80'},
+            //     {id: 'test_02', date: '2022/05/27', factory: '進口種蝦', project: 'EHP', result_one: '未檢出', result_two: '未檢出', remark: '以隨機抽樣方式檢驗，若本檢驗報告顯示二重複中有一檢出病毒為該池部分蝦子已有感染。', img: 'https://images.unsplash.com/photo-1516741449206-2db1f9b79d10?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80'},
+            //     {id: 'test_03', date: '2022/05/23', factory: '高峰A8', project: 'EHP', result_one: '非常輕微感染', result_two: '非常輕微感染', remark: '備註03', img: 'https://images.unsplash.com/photo-1518960799632-ff8984f6a298?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=736&q=80'},
+            //     {id: 'test_04', date: '2022/05/23', factory: '高峰A10', project: 'EHP', result_one: '非常輕微感染', result_two: '未檢出', remark: '備註04', img: 'https://images.unsplash.com/photo-1617717290456-813af868f96a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1171&q=80'},
+            // ],
             test_result: [],
 
             dialog: false,
@@ -149,19 +188,12 @@ export default {
         try{
             axios.get('/api/read-excel/')
             .then(res=>{
+                // console.log(res);
                 this.test_result = res.data
                 const map = {}
                 for (const data of res.data){
                     for(const item of data.items){
-                        if(!map[item.name]){
-                            map[item.name] = {}
-                        }
-                        map[item.name] = {
-                            date: data.date["sample"],
-                            result: item.result,
-                            remark: data.remark,
-                            method: data.method,
-                        }
+                        map[item.name] = item.result
                     }
                 }
                 console.log(map);
