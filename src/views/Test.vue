@@ -3,7 +3,7 @@
         <h3 class="ma-4 text-h5 font-weight-bold">蝦苗病毒檢測</h3>
 
         <v-divider></v-divider>
-        <v-container>
+        <v-container class="px-8 py-4 px-lg-12 py-lg-8">
             <v-card>
                 <v-card-title class="font-weight-bold">篩選查詢條件</v-card-title>
                 <v-card-text>
@@ -15,19 +15,19 @@
                                 :items="filters" label="請選擇欲查詢內容" dense solo></v-select>
                         </v-col>
 
-                        <!-- 廠池選擇 -->
+                        <!-- 取樣地點 -->
                         <v-col class="mx-4" cols="6" md="4" lg="3" v-if="filter_idx === filters[0] || filter_idx === filters[2]">
-                            <v-chip class="text-subtitle-1" color="green darken-2" label text-color="white" >廠池</v-chip>
+                            <v-chip class="text-subtitle-1" color="green darken-2" label text-color="white" >取樣地點</v-chip>
                             <v-select @change="changeFactory" v-model="position_idx" hide-details
-                                :items="positions" label="請選擇廠池" dense solo></v-select>
+                                :items="position_SET" label="請選擇取樣地點" dense solo></v-select>
                         </v-col>
 
-                        <!-- 測試項目 -->
+                        <!-- 池號 -->
                         <v-col class="mx-4" cols="6" md="4" lg="3" v-if="filter_idx === filters[0] || filter_idx === filters[2]">
-                            <v-chip class="text-subtitle-1" color="green darken-2" label text-color="white" >測試項目</v-chip>
+                            <v-chip class="text-subtitle-1" color="green darken-2" label text-color="white" >池號</v-chip>
                             <v-select v-model="project_idx" hide-details
-                                :items="projects" label="請選擇測試項目" dense solo
-                                no-data-text="尚未選擇廠池"></v-select>
+                                :items="projects" label="請選擇池號" dense solo
+                                no-data-text="尚未選擇取樣地點"></v-select>
                         </v-col>
 
                         <!-- 日期區間 -->
@@ -52,7 +52,6 @@
                                     locale="zh-tw"
                                     v-model="start_date_idx"
                                     @input="start_date_menu = false"
-                                    @change="changeDatePicker"
                                 ></v-date-picker>
                             </v-menu>
                         </v-col>
@@ -79,7 +78,6 @@
                                     locale="zh-tw"
                                     v-model="end_date_idx"
                                     @input="end_date_menu = false"
-                                    @change="changeDatePicker"
                                 ></v-date-picker>
                             </v-menu>
                         </v-col>
@@ -105,7 +103,7 @@
                 </v-card-title>
                 <v-card-text>
                     <!-- 開始載入資料 -->
-                    <v-row v-if="search_loading || test_result.length === 0">
+                    <v-row v-if="search_loading">
                         <v-col cols="12">
                             <div  class="text-center mb-8">
                                 <h6 class="text-h6 font-weight-bold mb-2">載入資料中...</h6>
@@ -135,7 +133,7 @@
                                 <v-card-text>
                                     <v-row>
                                         <v-col cols="12" md="6" v-for="result in test.result" :key="result.item">
-                                            <v-card color="orange lighten-5">
+                                            <v-card color="#dff9fb">
                                                 <v-card-title>
                                                     {{result.item}}
                                                 </v-card-title>
@@ -143,12 +141,12 @@
                                                     <v-row>
                                                         <v-col cols="6">
                                                             <v-card color="#130f40" min-width="100%">
-                                                                <v-card-text class="yellow--text font-weight-bold">{{result.output[0] ? result.output[0] : "無檢驗結果" }}</v-card-text>
+                                                                <v-card-text class="text-center yellow--text font-weight-bold">{{result.output[0] ? result.output[0] : "尚未檢驗" }}</v-card-text>
                                                             </v-card>
                                                         </v-col>
                                                         <v-col cols="6">
                                                             <v-card color="#130f40" min-width="100%">
-                                                                <v-card-text class="yellow--text font-weight-bold">{{result.output[1] ? result.output[1] : "無檢驗結果" }}</v-card-text>
+                                                                <v-card-text class="text-center yellow--text font-weight-bold">{{result.output[1] ? result.output[1] : "尚未檢驗" }}</v-card-text>
                                                             </v-card>
                                                         </v-col>
                                                     </v-row>
@@ -176,11 +174,20 @@
                 v-if="dialog"
                 width="900">
                     <v-card class="mx-auto ">
-                        <v-img height="300" :src="dialog_info.img"></v-img>
+                        <v-img height="300" src="https://images.unsplash.com/photo-1510941781581-59620dc6bfdd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80"></v-img>
+                        <!-- <v-img height="300" :src="dialog_info['images']['EHP']"></v-img> -->
                         <div>
-                            <v-card-title>
-                                備註
-                            </v-card-title>
+                            <v-card-title>檢驗方法</v-card-title>
+                            <v-card-text>
+                                <v-textarea
+                                    background-color="blue lighten-5"
+                                    solo readonly
+                                    :value="dialog_info.method"
+                                ></v-textarea>
+                            </v-card-text>
+                        </div>
+                        <div>
+                            <v-card-title>備註</v-card-title>
                             <v-card-text>
                                 <v-textarea
                                     background-color="blue lighten-5"
@@ -209,7 +216,7 @@ export default {
             filters: ["只查詢廠池", "只查詢特定日期區間", "以上均查詢"],
             filter_idx: null,
 
-            positions: ["2B#2901", "2B#1905", "1903", "A2", "1101"],
+            positions: [],
             position_idx: null,
             projects: ["EHP", "EMS", "WSSV"],
             project_idx: null,
@@ -220,10 +227,7 @@ export default {
             ResultJson: [],
 
             dialog: false,
-            dialog_info: {
-                remark: '',
-                img: '',
-            },
+            dialog_info: {},
             search_loading: false,
         }
     },
@@ -231,38 +235,47 @@ export default {
     computed:{
         test_result(){
             const demo = []
+            const position_len = this.positions.length // 代表第一次執行。要將取樣地點給列出來
             for (const data of this.ResultJson ){
+                if(position_len === 0 ){
+                    this.positions = [...this.positions, ...data.positions] // 合併
+                }
                 for(const item of data.items){
                     const obj = {
                         id: uuidv4(), // 特別加裝一個 uuid
                         name: item.name,
                         result: item.result,
-                        date: data.date,
-                        method: data.method,
-                        remark: data.remark,
+                        ...data
                     }
                     demo.push(obj)
                 }
             }
             return demo.reverse()
+        },
+
+        position_SET(){ // 將重複的值清除
+            return [...new Set(this.positions)]
         }
     },
 
     async created(){
-        this.searchAll()
+        await this.searchAll()
     },
 
     methods:{
         searchAll(){ // 搜尋全部(不限日期)
+            this.search_loading = true;
             try{
                 axios.get('/api/read-excel/')
                     .then(res=>{
                         this.ResultJson = res.data.data
+                        this.search_loading = false;
                     })
             }catch(err){
                 console.log(err);
             }
         },
+
         changeFilter(){
             this.position_idx = null;
             this.start_date_idx = null;
@@ -270,43 +283,44 @@ export default {
         },
 
         changeFactory(){
-            
-        },
-        changeDatePicker(){
-
         },
 
-        goSearch(){ // 搜尋特定結果(限定日期區間 or 廠號)
-            // if(!this.start_date_idx || !this.end_date_idx){
-            //     this.$swal.fire("查詢失敗", "請確實填入查詢條件", "error")
-            // }else{
+        async goSearch(){ // 搜尋特定結果(限定日期區間 or 廠號)
+            // 1.只查詢日期區間
+            // 2.只查詢特定取樣地點
+            // 3.同時查詢日期區間及取樣地點
+            const rule_one = !this.position_idx
+            const rule_two = !this.start_date_idx || !this.end_date_idx
+            const rule_three = rule_one || rule_two
+            const search = this.filter_idx === this.filters[0] ? rule_one : this.filters[1] ? rule_two : rule_three
+
+            this.ResultJson = [] // 清空資料
+
+            if(search){ // 如果條件不符合則代表查詢失敗(True)
+                this.$swal.fire("查詢失敗", "請確實填入查詢條件", "error")
+            }else{
                 this.search_loading = true;
                 try{
-                    axios.get('/api/read-excel/',{
-                        params:{
-                            start_date: this.start_date_idx,
-                            end_date: this.end_date_idx,
-                            position: this.position_idx,
-                        }
-                    })
-                    .then(res=>{
-                        setTimeout(() => {
-                            this.search_loading = false;
-                            this.$swal.fire("查詢成功", "", "success")
-                            this.ResultJson = res.data.data
-                        }, 1000);
-                    })
+                    const params = {
+                        start_date: this.start_date_idx,
+                        end_date: this.end_date_idx,
+                        position: this.position_idx,
+                    }
+                    const response = await axios.get('/api/read-excel/', { params: params } )
+                    this.$swal.fire("查詢成功", "", "success")
+                    this.search_loading = false;
+                    this.ResultJson = response.data.data
                 }catch(err){
-                    console.log(err);
+                    this.$swal.fire("查詢失敗", err, "error")  
+                    this.search_loading = false;
+                    this.ResultJson = [] 
                 }
-            // }
+            }
         },
 
         readProjectTest(test){
-            // this.dialog_info.remark = test.remark
-            // this.dialog_info.img = test.img;
+            this.dialog_info = test
             this.dialog = true;
-
         },
     }
 }
