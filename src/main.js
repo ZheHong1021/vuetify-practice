@@ -15,6 +15,9 @@ Vue.use(VueSweetalert2);
 // npm install --save material-design-icons-iconfont
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 
+// 【ScrollTo】
+const VueScrollTo = require('vue-scrollto');
+Vue.use(VueScrollTo);
 
 // 【VueFontawesome】
 import {library} from '@fortawesome/fontawesome-svg-core'
@@ -37,6 +40,12 @@ Vue.prototype.$axios = axios
 
 // 全域 mixins
 Vue.mixin({
+  computed:{
+    is_mobile(){ // 是否為手機介面(vuetify)
+      const rwd_name = this.$vuetify.breakpoint.name;
+      return rwd_name === 'sm' || rwd_name === 'xs'
+    }
+  },
   methods: {
       // 解決四捨五入精密度所帶來的問題
       roundToTwo(num) {
