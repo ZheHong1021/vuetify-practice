@@ -4,12 +4,9 @@
     <Navbar/>
 
     <v-main>
-
-      <v-container fluid >
         <keep-alive>
           <router-view></router-view>
         </keep-alive>
-      </v-container>
 
 
       <!-- 回頂部的按鈕: 只要頁面往下滑動則會浮出按鈕(手機板不要有 tooltip效果) -->

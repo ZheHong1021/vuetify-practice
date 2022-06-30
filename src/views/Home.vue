@@ -1,5 +1,5 @@
 <template>
-  <div class="main-container">
+  <div>
     <!-- The video -->
     <video autoplay muted loop id="myVideo">
       <source src="../assets/images/fish_-_1080 (Original).mp4" type="video/mp4">
@@ -17,7 +17,7 @@
       </v-col>
     </v-row>
 
-    <v-row class="text-center text-container">
+    <!-- <v-row class="text-center text-container">
         <v-col cols="12" class="d-flex flex-column justify-center align-center">
           <h1 class="text-h4 text-lg-h2 text-md-h4 text-sm-h5">推薦</h1>
         </v-col>
@@ -33,12 +33,11 @@
         <v-col cols="12" class="d-flex flex-column justify-center align-center">
           <h1 class="text-h4 text-lg-h2 text-md-h4 text-sm-h5">回饋</h1>
         </v-col>
-    </v-row>
+    </v-row> -->
   </div>
 </template>
 
 <script>
-import axios from 'axios';
   export default {
     components: {
       
