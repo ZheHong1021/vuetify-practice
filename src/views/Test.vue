@@ -1,9 +1,14 @@
 <template>
   <div>
-        <h3 class="ma-4 text-h5 font-weight-bold">蝦苗病毒檢測</h3>
+        <h3 class="ma-4 text-h5 font-weight-bold d-flex align-center">
+            <img width="35" height="35" :src="require(`@/assets/images/shrimp.svg`)" alt="">
+            <span class="ml-1">蝦苗病毒檢測</span>
+        </h3>
         <v-divider></v-divider>
         <div class="bg-wrapper">
-            <v-container class="px-4 py-4 px-md-8 px-lg-12 py-lg-8">
+            <v-container class="px-4 py-4 px-md-8 px-lg-12 py-lg-8 ">
+
+                <!-- 篩選 -->
                 <v-card color="green lighten-5" elevation="10">
                     <v-card-title class="font-weight-bold">篩選查詢條件</v-card-title>
                     <v-card-text>
@@ -97,6 +102,8 @@
                     </v-card-text>
                 </v-card>
                 
+
+                <!-- 紀錄結果 -->
                 <v-card elevation="10" class="my-8" >
                     <v-card-title class="font-weight-bold">
                         蝦類病毒檢驗記錄表
@@ -110,7 +117,7 @@
                         <!-- 開始載入資料 -->
                         <v-row v-if="search_loading">
                             <v-col cols="12">
-                                <div  class="text-center mb-8">
+                                <div class="text-center mb-8">
                                     <h6 class="text-h6 font-weight-bold mb-2">載入資料中...</h6>
                                     <v-progress-circular
                                         :width="3"
@@ -123,8 +130,8 @@
 
                         <!-- 讀取資料 -->
                         <v-row v-else-if="test_result.length > 0 && !search_loading">
-                            <v-col cols="12" sm="6" lg="4" v-for="test in test_result" :key="test.id">
-                                <v-card min-height="350" @click="readProjectTest(test)">
+                            <v-col cols="12" sm="6" lg="4" v-for="test in showPageData" :key="test.id">
+                                <v-card min-height="350" @click="readProjectTest(test)" elevation="10" class="hover-card">
                                     <v-card-title class="font-weight-bold">
                                         <v-chip class="text-subtitle-1 mr-2 font-weight-bold" color="black" label text-color="white">取樣地點</v-chip>
                                         {{ test.name }}
@@ -163,8 +170,17 @@
                                     </v-card-text>
                                 </v-card>
                             </v-col>
+
+                            <v-col cols="12">
+                                <v-pagination
+                                    v-model="page"
+                                    :length="page_length"
+                                    color="black"
+                                ></v-pagination>
+                            </v-col>
                         </v-row>
 
+                        <!-- 查無資料 -->
                         <v-row v-else>
                             <v-col cols="12">
                                 <div  class="text-center mb-8">
@@ -175,32 +191,21 @@
                     </v-card-text>
                 </v-card>
 
-                <!-- 點擊單一紀錄時會觸發的介面 -->
-                <v-dialog
-                    v-model="dialog"
-                    v-if="dialog"
-                    width="900">
+                <!-- 單一紀錄結果 -->
+                <v-dialog v-model="dialog" v-if="dialog" width="900">
                         <v-card class="pa-4">
                             <div>
-                                檢驗方法
-                                    <v-textarea
-                                        auto-grow
-                                        height="auto"
-                                        rows="1"
-                                        background-color="blue lighten-5"
-                                        solo readonly
-                                        :value="dialog_info.method"
+                                <h3>檢驗方法</h3>
+                                    <v-textarea auto-grow height="auto" rows="1"
+                                        background-color="light-blue lighten-5"
+                                        solo readonly :value="dialog_info.method"
                                     ></v-textarea>
                             </div>
                             <div>
-                                備註
-                                    <v-textarea
-                                        auto-grow
-                                        height="auto"
-                                        rows="1"
-                                        background-color="blue lighten-5"
-                                        solo readonly
-                                        :value="dialog_info.remark"
+                                <h3>備註</h3>
+                                    <v-textarea auto-grow height="auto" rows="1"
+                                        background-color="light-blue lighten-5"
+                                        solo readonly :value="dialog_info.remark"
                                     ></v-textarea>
                             </div>
 
@@ -214,17 +219,13 @@
                                         <v-col cols="12" md="6" v-for="image, key in dialog_info.images" :key="key">
                                             <expandable-image v-if="image" 
                                                 :close-on-background-click="true"
-                                                :src="require(`@/assets/images/test_result/${image}`)"
-                                                />
+                                                :src="require(`@/assets/images/test_result/${image}`)"/>
                                         </v-col>
                                     </v-row>
                                 </v-card-text>
                             </v-card>
-
-
                         </v-card>
                 </v-dialog>
-
             </v-container>
         </div>
   </div>
@@ -259,11 +260,14 @@ export default {
             dialog: false,
             dialog_info: {},
             search_loading: false,
+
+            page: 1,
+            pageRow: 6,
         }
     },
 
     computed:{
-        test_result(){
+        test_result(){ // 將從後端得到的資料進行處理(主要是用來顯示)
             const demo = []
             const position_len = this.positions.length // 代表第一次執行。要將取樣地點給列出來
             for (const data of this.ResultJson ){
@@ -281,6 +285,24 @@ export default {
                 }
             }
             return demo
+        },
+
+
+        showPageData(){ // 追加了換頁功能，因此可以將上面『test_result』的內容(陣列)進行切片來決定要顯示哪幾筆資料
+            const {page, pageRow} = this
+            // 第一頁: [0:6] → 陣列0~5 → 共六筆
+            // 第二頁: [6:12] → 陣列6~11 → 共六筆
+            // 切片[ (頁數-1)*單頁數量 : 頁數*單頁數量 ]
+            return this.test_result.slice( (page-1)*pageRow, page*pageRow)
+        },
+
+        page_length(){ // 總頁數( 資料總筆數 / 單頁顯示筆數 + 1) 
+            const {test_result, pageRow} = this
+            // 如果筆數剛好為 11，頁數應該為 『 11 / 6 + 1 』 = 2頁
+            // 如果筆數剛好為 12，頁數應該為 『 12 / 6 + 0 』 = 2頁
+            // 如果筆數剛好為 13，頁數應該為 『 13 / 6 + 1 』 = 3頁
+            const is_add = ((test_result.length % pageRow) === 0) ? 0 : 1 
+            return parseInt(test_result.length / pageRow) + is_add
         },
 
         position_SET(){ // 將重複的值清除
@@ -378,6 +400,43 @@ export default {
         max-height: 100%;
         object-fit: contain;
         margin: 0 auto;
+    }
+
+    .hover-card{
+        transition: .5s;
+        position: relative;
+    }
+
+
+    .hover-card::after{
+        content: "點擊查看";
+        opacity: 0;
+        visibility: hidden;
+        background: #ffffff;
+        color: #1e272e;
+        border-radius: 10px;
+        position: absolute;
+        bottom: 0%;
+        left: 50%;
+        transform: translate(-50%, -0%);
+        padding: 0.25rem 0.75rem;
+        font-size: .925rem;
+        font-weight: bolder;
+        transition: 0.5s;
+    }
+
+
+    .hover-card:hover{
+        transform: translateY(-15px);
+        background-color: #f7f1e3;
+    }
+
+    .hover-card:hover::after{
+        visibility: visible;
+        opacity: 1;
+        bottom: 10%;
+        left: 50%;
+        transform: translate(-50%, -10%);
     }
 
 </style>
