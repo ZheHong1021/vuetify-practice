@@ -39,7 +39,9 @@ export default {
     return({
         nowDate: "",    // 当前日期
         nowTime: "",    // 当前时间
-        nowWeek: ""     // 当前星期
+        nowWeek: "",     // 当前星期,
+
+        timer: null,
     })
   },
   computed: {

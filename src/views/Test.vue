@@ -6,29 +6,51 @@
         </h3>
         <v-divider></v-divider>
         <div class="bg-wrapper">
-            <v-container class="px-4 py-4 px-md-8 px-lg-12 py-lg-8 ">
+            
+            <v-form ref="uploadFileForm" v-model="uploadFormValid" class="d-flex align-center justify-center">
+                <v-file-input
+                    v-model="fileInfo"
+                    show-size
+                    chips
+                    outlined
+                    prepend-inner-icon="mdi-file-excel"
+                    prepend-icon=""
+                    accept=".xls,.xlsx"
+                    :disabled="uploadIsLoading"
+                    :loading="uploadIsLoading"
+                    placeholder="請將欲使用的報表載入"
+                    hide-details>
+                    <template v-slot:selection="{ text }">
+                    <v-chip color="deep-purple accent-4" dark label small>{{ text }}</v-chip>
+                </template>
+                </v-file-input>
+            </v-form>
+            <v-btn class="mx-2" color="success" @click="uploadFile()">上傳</v-btn>
 
+
+            <v-container class="px-4 py-4 px-md-8 px-lg-12 py-lg-8 ">
                 <!-- 篩選 -->
                 <v-card color="green lighten-5" elevation="10">
                     <v-card-title class="font-weight-bold">篩選查詢條件</v-card-title>
                     <v-card-text>
+                        <!-- 下拉選單 -->
+                        <div style="width: 30%;" class="mx-auto">
+                            <v-chip class="text-subtitle-1" color="black" label text-color="white" >查詢內容</v-chip>
+                            <v-select @change="changeFilter" v-model="filter_idx" hide-details
+                                :items="filters" label="請選擇欲查詢內容" dense solo></v-select>
+                        </div>
                         <v-row class="my-2 d-flex justify-center align-center">
-                            <!-- 下拉選單 -->
-                            <v-col class="mx-4 d-flex align-center" cols="12" >
-                                <v-chip class="text-subtitle-1" color="green darken-2" label text-color="white" >查詢內容</v-chip>
-                                <v-select @change="changeFilter" v-model="filter_idx" hide-details
-                                    :items="filters" label="請選擇欲查詢內容" dense solo></v-select>
-                            </v-col>
 
+                            
                             <!-- 取樣地點 -->
-                            <v-col class="mx-4" cols="6" md="4" lg="3" v-if="filter_idx === filters[0] || filter_idx === filters[2]">
+                            <v-col class="mx-4" cols="6" md="4"  v-if="filter_idx === filters[0] || filter_idx === filters[2]">
                                 <v-chip class="text-subtitle-1" color="green darken-2" label text-color="white" >取樣地點</v-chip>
                                 <v-select @change="changeFactory" v-model="position_idx" hide-details
                                     :items="position_SET" label="請選擇取樣地點" dense solo></v-select>
                             </v-col>
 
                             <!-- 池號 -->
-                            <v-col class="mx-4" cols="6" md="4" lg="3" v-if="filter_idx === filters[0] || filter_idx === filters[2]">
+                            <v-col class="mx-4" cols="6" md="4"  v-if="filter_idx === filters[0] || filter_idx === filters[2]">
                                 <v-chip class="text-subtitle-1" color="green darken-2" label text-color="white" >池號</v-chip>
                                 <v-select v-model="project_idx" hide-details
                                     :items="projects" label="請選擇池號" dense solo
@@ -36,7 +58,7 @@
                             </v-col>
 
                             <!-- 日期區間 -->
-                            <v-col class="mx-4" cols="6" md="4" lg="3" v-if="filter_idx === filters[1] || filter_idx === filters[2]">
+                            <v-col class="mx-4" cols="6" md="4"  v-if="filter_idx === filters[1] || filter_idx === filters[2]">
                                 <v-chip class="text-subtitle-1" color="green darken-2" label text-color="white" >起始日期</v-chip>
                                 <v-menu
                                     v-model="start_date_menu"
@@ -62,7 +84,7 @@
                             </v-col>
 
                             <!-- 日期區間 -->
-                            <v-col class="mx-4" cols="6" md="4" lg="3" v-if="filter_idx === filters[1] || filter_idx === filters[2]">
+                            <v-col class="mx-4" cols="6" md="4"  v-if="filter_idx === filters[1] || filter_idx === filters[2]">
                                 <v-chip class="text-subtitle-1" color="green darken-2" label text-color="white" >結束日期</v-chip>
                                 <v-menu
                                     v-model="end_date_menu"
@@ -242,7 +264,11 @@ export default {
     },
     data(){
         return{
-            filters: ["只查詢廠池", "只查詢特定日期區間", "以上均查詢"],
+            uploadFormValid: '',
+            fileInfo: [],
+            uploadIsLoading: false,
+
+            filters: ["只篩選廠池", "只篩選日期區間", "以上均篩選"],
             filter_idx: null,
 
             positions: [],
@@ -315,6 +341,42 @@ export default {
     },
 
     methods:{
+        // https://blog.csdn.net/qq_39569480/article/details/109309111
+        uploadFile(replace){ // 上傳檔案 (replace代表欲上傳的檔案不存在，沒有取代問題。預設 False)
+          if(this.$refs.uploadFileForm.validate()){
+            this.uploadIsLoading = true; // Loading
+            let formData = new window.FormData() 
+            formData.append("file", this.fileInfo)
+            if(replace){
+              formData.append("replace", true)
+            }
+            setTimeout(() => {
+
+                axios.post("/api/uploadFile/", formData, {
+                    headers: {'Content-Type': 'multipart/form-data'}
+                }).then(res=>{
+                    const statusCode = res.status
+                    this.uploadIsLoading = false;
+                    if(statusCode === 200){
+                        this.$swal.fire(res.data.message, "", "success")
+                    }
+                })
+                .catch(err=>{
+                    this.uploadIsLoading = false;
+                    this.$swal.fire("檔案上傳失敗!", "", "warning")
+                })
+              
+            }, 1500);
+          }
+
+        },
+
+        importAjax(data){
+          return axios.post("/api/uploadFile/", data, {
+            headers: {'Content-Type': 'multipart/form-data'}
+          })
+        },
+
         searchAll(){ // 搜尋全部(不限日期)
             this.search_loading = true;
             try{
@@ -412,15 +474,15 @@ export default {
         content: "點擊查看";
         opacity: 0;
         visibility: hidden;
-        background: #ffffff;
-        color: #1e272e;
+        background: #000;
+        color: #fff;
         border-radius: 10px;
         position: absolute;
         bottom: 0%;
         left: 50%;
         transform: translate(-50%, -0%);
-        padding: 0.25rem 0.75rem;
-        font-size: .925rem;
+        padding: 0.5rem 0.75rem;
+        font-size: 1.15rem;
         font-weight: bolder;
         transition: 0.5s;
     }
@@ -434,9 +496,9 @@ export default {
     .hover-card:hover::after{
         visibility: visible;
         opacity: 1;
-        bottom: 10%;
+        bottom: 5%;
         left: 50%;
-        transform: translate(-50%, -10%);
+        transform: translate(-50%, -5%);
     }
 
 </style>
