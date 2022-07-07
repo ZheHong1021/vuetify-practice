@@ -241,7 +241,7 @@
                                         <v-col cols="12" md="6" v-for="image, key in dialog_info.images" :key="key">
                                             <expandable-image v-if="image" 
                                                 :close-on-background-click="true"
-                                                :src="require(`@/assets/images/test_result/${image}`)"/>
+                                                :src="image"/>
                                         </v-col>
                                     </v-row>
                                 </v-card-text>
@@ -351,7 +351,6 @@ export default {
               formData.append("replace", true)
             }
             setTimeout(() => {
-
                 axios.post("/api/uploadFile/", formData, {
                     headers: {'Content-Type': 'multipart/form-data'}
                 }).then(res=>{
@@ -359,22 +358,16 @@ export default {
                     this.uploadIsLoading = false;
                     if(statusCode === 200){
                         this.$swal.fire(res.data.message, "", "success")
+                        this.searchAll()
                     }
                 })
                 .catch(err=>{
+                    const msg = err.response.data["message"]
                     this.uploadIsLoading = false;
-                    this.$swal.fire("檔案上傳失敗!", "", "warning")
+                    this.$swal.fire("檔案上傳失敗!", msg, "warning")
                 })
-              
             }, 1500);
           }
-
-        },
-
-        importAjax(data){
-          return axios.post("/api/uploadFile/", data, {
-            headers: {'Content-Type': 'multipart/form-data'}
-          })
         },
 
         searchAll(){ // 搜尋全部(不限日期)

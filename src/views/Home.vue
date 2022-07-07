@@ -10,7 +10,7 @@
         <h1 class="text-h4 text-lg-h3 text-md-h4 text-sm-h5">歡迎使用養殖系統</h1>
         <br>
         <p>本系統目標為讓使用者可以得知養殖池蝦子的成長情況</p>
-        <v-btn rounded color="success" dark x-large @click="$router.push('/about')">
+        <v-btn rounded color="success" dark x-large @click="$router.push('/Test')">
               <v-icon class="mr-2">start</v-icon>
               Start
           </v-btn>
