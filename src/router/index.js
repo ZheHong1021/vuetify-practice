@@ -47,6 +47,11 @@ const routes = [
     name: 'Test',
     component: loadView("Test")
   },
+  {
+    path: '/file',
+    name: 'FileDownload',
+    component: loadView("file_download")
+  },
 
   
   /* 把 404 Page放置到最下面(*) */

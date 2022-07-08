@@ -7,27 +7,7 @@
         <v-divider></v-divider>
         <div class="bg-wrapper">
             
-            <v-form ref="uploadFileForm" v-model="uploadFormValid" class="d-flex align-center justify-center">
-                <v-file-input
-                    v-model="fileInfo"
-                    show-size
-                    chips
-                    outlined
-                    prepend-inner-icon="mdi-file-excel"
-                    prepend-icon=""
-                    accept=".xls,.xlsx"
-                    :disabled="uploadIsLoading"
-                    :loading="uploadIsLoading"
-                    placeholder="請將欲使用的報表載入"
-                    hide-details>
-                    <template v-slot:selection="{ text }">
-                    <v-chip color="deep-purple accent-4" dark label small>{{ text }}</v-chip>
-                </template>
-                </v-file-input>
-            </v-form>
-            <v-btn class="mx-2" color="success" @click="uploadFile()">上傳</v-btn>
-
-
+            
             <v-container class="px-4 py-4 px-md-8 px-lg-12 py-lg-8 ">
                 <!-- 篩選 -->
                 <v-card color="green lighten-5" elevation="10">
@@ -153,7 +133,8 @@
                         <!-- 讀取資料 -->
                         <v-row v-else-if="test_result.length > 0 && !search_loading">
                             <v-col cols="12" sm="6" lg="4" v-for="test in showPageData" :key="test.id">
-                                <v-card min-height="350" @click="readProjectTest(test)" elevation="10" class="hover-card">
+                                <!-- min-height: 讓每一個 card等高 -->
+                                <v-card min-height="100%" @click="readProjectTest(test)" elevation="10" class="hover-card">
                                     <v-card-title class="font-weight-bold">
                                         <v-chip class="text-subtitle-1 mr-2 font-weight-bold" color="black" label text-color="white">取樣地點</v-chip>
                                         {{ test.name }}
@@ -264,9 +245,7 @@ export default {
     },
     data(){
         return{
-            uploadFormValid: '',
-            fileInfo: [],
-            uploadIsLoading: false,
+
 
             filters: ["只篩選廠池", "只篩選日期區間", "以上均篩選"],
             filter_idx: null,
@@ -341,39 +320,10 @@ export default {
     },
 
     methods:{
-        // https://blog.csdn.net/qq_39569480/article/details/109309111
-        uploadFile(replace){ // 上傳檔案 (replace代表欲上傳的檔案不存在，沒有取代問題。預設 False)
-          if(this.$refs.uploadFileForm.validate()){
-            this.uploadIsLoading = true; // Loading
-            let formData = new window.FormData() 
-            formData.append("file", this.fileInfo)
-            if(replace){
-              formData.append("replace", true)
-            }
-            setTimeout(() => {
-                axios.post("/api/uploadFile/", formData, {
-                    headers: {'Content-Type': 'multipart/form-data'}
-                }).then(res=>{
-                    const statusCode = res.status
-                    this.uploadIsLoading = false;
-                    if(statusCode === 200){
-                        this.$swal.fire(res.data.message, "", "success")
-                        this.searchAll()
-                    }
-                })
-                .catch(err=>{
-                    const msg = err.response.data["message"]
-                    this.uploadIsLoading = false;
-                    this.$swal.fire("檔案上傳失敗!", msg, "warning")
-                })
-            }, 1500);
-          }
-        },
-
         searchAll(){ // 搜尋全部(不限日期)
             this.search_loading = true;
             try{
-                axios.get('/api/read-excel/')
+                axios.get('/api/readExcel/')
                     .then(res=>{
                         this.ResultJson = res.data.data
                         this.ResultJson.sort((n1, n2)=> n1.date.sample < n2.date.sample ? 1 : -1)
@@ -414,7 +364,7 @@ export default {
                         end_date: this.end_date_idx,
                         position: this.position_idx,
                     }
-                    const response = await axios.get('/api/read-excel/', { params: params } )
+                    const response = await axios.get('/api/readExcel/', { params: params } )
                     this.$swal.fire("查詢成功", "", "success")
                     this.search_loading = false;
                     this.ResultJson = response.data.data
