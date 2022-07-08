@@ -59,10 +59,37 @@
                             <template v-if="filter_file_list.length > 0">
                                 <v-col cols="12" sm="6" md="4" lg="3" 
                                     v-for="file in filter_file_list" :key="file.id">
-                                        <v-card  class="file d-flex flex-column align-center py-4" 
-                                            @click="deleteFile(file.name)">
-                                            <h3 class="text-subtitle-1 font-weight-bold">{{ file.name }}</h3>
-                                            <v-icon class="my-4" color="green darken-2" size="64">description</v-icon>
+                                        <v-card >
+                                            <v-card-title class="text-subtitle-1 font-weight-bold justify-center">
+                                                {{ file.name }}
+                                            </v-card-title>
+                                            <v-card-text class="d-flex flex-column align-center pa-0">
+                                                <v-icon color="green darken-2" class="mb-2" size="64">description</v-icon>
+                                                <!-- <span class="ml-auto">{{ file.date }}</span> -->
+                                            </v-card-text>
+                                            
+                                            <v-divider></v-divider>
+
+                                            <v-card-actions>
+                                                <v-spacer></v-spacer>
+                                                <v-tooltip top>
+                                                    <template v-slot:activator="{ on, attrs }">
+                                                        <v-btn icon @click="downloadFile(file.name)" v-bind="attrs" v-on="on">
+                                                            <v-icon color="primary">mdi-download</v-icon>
+                                                        </v-btn>
+                                                    </template>
+                                                    <span>下載</span>
+                                                </v-tooltip>
+
+                                                <v-tooltip top>
+                                                    <template v-slot:activator="{ on, attrs }">
+                                                        <v-btn icon @click="deleteFile(file.name)" v-bind="attrs" v-on="on">
+                                                            <v-icon color="blue-grey darken-3">mdi-delete</v-icon>
+                                                        </v-btn>
+                                                    </template>
+                                                    <span>刪除</span>
+                                                </v-tooltip>
+                                            </v-card-actions>
                                         </v-card>
                                 </v-col>
                             </template>

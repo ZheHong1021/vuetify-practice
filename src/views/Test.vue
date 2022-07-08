@@ -132,6 +132,10 @@
 
                         <!-- 讀取資料 -->
                         <v-row v-else-if="test_result.length > 0 && !search_loading">
+                            <v-col cols="12">
+                                <h3 class="font-weight-bold text-h5 text-center">查詢結果: {{ test_result.length }}筆</h3>
+                            </v-col>
+
                             <v-col cols="12" sm="6" lg="4" v-for="test in showPageData" :key="test.id">
                                 <!-- min-height: 讓每一個 card等高 -->
                                 <v-card min-height="100%" @click="readProjectTest(test)" elevation="10" class="hover-card">
@@ -186,8 +190,12 @@
                         <!-- 查無資料 -->
                         <v-row v-else>
                             <v-col cols="12">
-                                <div  class="text-center mb-8">
-                                    <h6 class="text-h6 font-weight-bold mb-2">查無資料</h6>
+                                <div class="text-center mb-8 d-flex flex-column justify-center align-center" style="min-height: 450px;">
+                                    <img width="150" height="auto" :src="require('@/assets/images/no-data.svg')" alt="">
+                                    <div class="mt-4">
+                                        <h6 class="text-h6 text-md-h5 font-weight-bold mb-2 red--text">查無資料</h6>
+                                        <p class="text-subtitle-1 text-md-h6">請重新選擇篩選條件再查詢!!</p>
+                                    </div>
                                 </div>
                             </v-col>
                         </v-row>
@@ -245,8 +253,6 @@ export default {
     },
     data(){
         return{
-
-
             filters: ["只篩選廠池", "只篩選日期區間", "以上均篩選"],
             filter_idx: null,
 
@@ -352,11 +358,16 @@ export default {
             const rule_three = rule_one || rule_two
             const search = this.filter_idx === this.filters[0] ? rule_one : this.filters[1] ? rule_two : rule_three
 
-            this.ResultJson = [] // 清空資料
+            
 
             if(search){ // 如果條件不符合則代表查詢失敗(True)
                 this.$swal.fire("查詢失敗", "請確實填入查詢條件", "error")
             }else{
+                if(this.start_date_idx > this.end_date_idx){
+                    this.$swal.fire("查詢失敗", "起始日期不能超過結束日期", "error")
+                    return 
+                }
+                this.ResultJson = [] // 清空資料
                 this.search_loading = true;
                 try{
                     const params = {
